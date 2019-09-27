@@ -1,4 +1,4 @@
-dockerimage ?= das/vmz
+dockerimage ?= moabitcoin/ig65m-pytorch
 dockerfile ?= Dockerfile
 srcdir ?= $(shell pwd)
 datadir ?= $(shell pwd)
