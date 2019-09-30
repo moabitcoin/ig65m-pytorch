@@ -7,7 +7,7 @@ Official implementation from FB provide pre-trained models as `.pkl` files. You 
 
 - [r2plus1d_34_clip8_ig65m_from_scratch](https://www.dropbox.com/s/y8vx3gihhsd8f5b/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl?)
 - [r2plus1d_34_clip8_ft_kinetics_from_ig65m](https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl)
-- [r2plus1d_34_clip32_ig65m_from_scratch](https://www.dropbox.com/s/y8vx3gihhsd8f5b/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl)
+- [r2plus1d_34_clip32_ig65m_from_scratch](https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl)
 - [r2plus1d_34_clip32_ft_kinetics_from_ig65m](https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl)
 
 ## PyTorch + ONNX Models :trophy:
@@ -20,7 +20,7 @@ We also [provide](https://github.com/moabitcoin/ig65m-pytorch/releases) converte
 |-------------|:-------------------------|:----------|:-----------------------------------------------|:-------------------------------------------|
 |  R(2+1)D_34   | IG-65M + None          |  8x112x112 | [*r2plus1d_34_clip8_ig65m_from_scratch_9bae36ae.pth*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch_9bae36ae.pth)    | [*r2plus1d_34_clip8_ig65m_from_scratch_748ab053.pb*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch_748ab053.pb)     |
 |  R(2+1)D_34   | IG-65M + Kinetics  |  8x112x112 | [*r2plus1d_34_clip8_ft_kinetics_from_ig65m_0aa0550b.pth*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m_0aa0550b.pth)  | [*r2plus1d_34_clip8_ft_kinetics_from_ig65m_625d61b3.pb*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m_625d61b3.pb) |
-|  R(2+1)D_34   | IG-65M + None       | 32x112x112 | NA                                              | NA                                            |
+|  R(2+1)D_34   | IG-65M + None       | 32x112x112 | [*r2plus1d_34_clip32_ig65m_from_scratch_449a7af9.pth*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch_449a7af9.pth)                                               | [*r2plus1d_34_clip32_ig65m_from_scratch_e304d648.pb*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch_e304d648.pb)                                            |
 |  R(2+1)D_34   | IG-65M + Kinetics  | 32x112x112 | [*r2plus1d_34_clip32_ft_kinetics_from_ig65m_ade133f1.pth*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m_ade133f1.pth) | [*r2plus1d_34_clip32_ft_kinetics_from_ig65m_10f4c3bf.pb*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m_10f4c3bf.pb)  |
 
 

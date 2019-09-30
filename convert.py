@@ -33,10 +33,17 @@ def r2plus1d_34(num_classes, pretrained=False, progress=False, **kwargs):
     return model
 
 
-def blobs_from_pkl(path):
+def blobs_from_pkl(path, num_classes):
     with path.open(mode="rb") as f:
         pkl = pickle.load(f, encoding="latin1")
-        return pkl["blobs"]
+        blobs = pkl["blobs"]
+
+        assert "last_out_L" + str(num_classes) + "_w" in blobs, \
+            "Number of --classes argument doesnt matche the last linear layer in pkl"
+        assert "last_out_L" + str(num_classes) + "_b" in blobs, \
+            "Number of --classes argument doesnt matche the last linear layer in pkl"
+
+        return blobs
 
 
 def copy_tensor(data, blobs, name):
@@ -161,7 +168,7 @@ def check_canary(model):
 
 
 def main(args):
-    blobs = blobs_from_pkl(args.pkl)
+    blobs = blobs_from_pkl(args.pkl, args.classes)
 
     model = r2plus1d_34(num_classes=args.classes)
 
@@ -199,6 +206,6 @@ if __name__ == "__main__":
     arg("pkl", type=Path, help=".pkl file to read the R(2+1)D 34 layer weights from")
     arg("out", type=Path, help="prefix to save converted R(2+1)D 34 layer weights to")
     arg("--frames", type=int, choices=(8, 32), required=True, help="clip frames for video model")
-    arg("--classes", type=int, choices=(400, 487), required=True, help="classes in last layer")
+    arg("--classes", type=int, choices=(359, 400, 487), required=True, help="classes in last layer")
 
     main(parser.parse_args())
