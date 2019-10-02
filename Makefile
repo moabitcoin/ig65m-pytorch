@@ -1,5 +1,5 @@
 dockerimage ?= moabitcoin/ig65m-pytorch
-dockerfile ?= Dockerfile
+dockerfile ?= Dockerfile.cpu
 srcdir ?= $(shell pwd)
 datadir ?= $(shell pwd)
 
@@ -16,20 +16,41 @@ u: update
 
 
 run:
-	@docker run -it --rm -v $(srcdir):/usr/src/app/  \
-	                     -v $(datadir):/data         \
-	                     --entrypoint=/bin/bash $(dockerimage)
+	@docker run                              \
+	  --ipc=host                             \
+	  -it                                    \
+	  --rm                                   \
+	  -v $(srcdir):/usr/src/app/             \
+	  -v $(datadir):/data                    \
+	  --entrypoint=/bin/bash $(dockerimage)
 
 r: run
 
 
+gpu:
+	@docker run                              \
+	  --runtime=nvidia                       \
+	  --ipc=host                             \
+	  -it                                    \
+	  --rm                                   \
+	  -v $(srcdir):/usr/src/app/             \
+	  -v $(datadir):/data                    \
+	  --entrypoint=/bin/bash $(dockerimage)
+
+g: gpu
+
+
 webcam:
-	@docker run -it --rm -v $(srcdir):/usr/src/app/  \
-	                     -v $(datadir):/data         \
-	                     --device=/dev/video0        \
-	                     --entrypoint=/bin/bash $(dockerimage)
+	@docker run                              \
+	  --ipc=host                             \
+	  -it                                    \
+	  --rm                                   \
+	  -v $(srcdir):/usr/src/app/             \
+	  -v $(datadir):/data                    \
+	  --device=/dev/video0                   \
+	  --entrypoint=/bin/bash $(dockerimage)
 
 w: webcam
 
 
-.PHONY: install i run r update u webcam w
+.PHONY: install i run r update u webcam w gpu g

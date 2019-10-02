@@ -24,44 +24,42 @@ We also [provide](https://github.com/moabitcoin/ig65m-pytorch/releases) converte
 |  R(2+1)D_34   | IG-65M + Kinetics  | 32x112x112 | [*r2plus1d_34_clip32_ft_kinetics_from_ig65m_ade133f1.pth*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m_ade133f1.pth) | [*r2plus1d_34_clip32_ft_kinetics_from_ig65m_10f4c3bf.pb*](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m_10f4c3bf.pb)  |
 
 
-### Convert model :spaghetti:
-```
-python convert.py --help
-convert.py [-h] --frames {8,32} --classes {400,487} pkl out
+### Usage
 
-positional arguments:
-  pkl                  .pkl file to read the R(2+1)D 34 layer weights from
-  out                  prefix to save converted R(2+1)D 34 layer weights to
+We provide CPU and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) based GPU Dockerfiles for self-contained and reproducible environments.
 
-optional arguments:
-  -h, --help           show this help message and exit
-  --frames {8,32}      clip frames for video model
-  --classes {400,487}  classes in last layer
-```
-
-### Extract features :cookie:
+Use the convenience Makefile to build the Docker image and then get into the container mounting a host directory to `/data` inside the container:
 
 ```
-python extract --help
-usage: extract.py [-h] --frames {8,32} --classes {400,487}
-                  [--batch-size BATCH_SIZE] [--num-workers NUM_WORKERS]
-                  [--labels LABELS]
-                  model video
-
-positional arguments:
-  model                 .pth file to load model weights from
-  video                 video file to run feature extraction on
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --frames {8,32}       clip frames for video model
-  --classes {400,487}   classes in last layer
-  --batch-size BATCH_SIZE
-                        number of sequences per batch for inference
-  --num-workers NUM_WORKERS
-                        number of workers for data loading
-  --labels LABELS       JSON file with label map array
+make
+make run datadir=/Path/To/My/Videos
 ```
+
+By default we build and run the CPU Docker images; for GPUs run:
+
+```
+make dockerfile=Dockerfile.gpu
+make gpu
+```
+
+The `WebcamDataset` requires exposing `/dev/video0` to the container which will only work on Linux:
+
+```
+make
+make webcam
+```
+
+
+### Convert Weights :spaghetti:
+
+Build the docker image and get into the container as described above.
+Then see the `convert.py` tool's `--help` and its source.
+
+### Extract Features :cookie:
+
+Build the docker image and get into the container as described above.
+Then see the `extract.py` tool's `--help` and its source.
+
 
 ## References :book:
 1. D. Tran, H. Wang, L. Torresani, J. Ray, Y. LeCun and M. Paluri. **A Closer Look at Spatiotemporal Convolutions for Action Recognition.** CVPR 2018.
