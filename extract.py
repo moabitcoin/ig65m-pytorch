@@ -263,7 +263,7 @@ if __name__ == "__main__":
     arg("model", type=Path, help=".pth file to load model weights from")
     arg("video", type=Path, help="video file to run feature extraction on")
     arg("--frames", type=int, choices=(8, 32), required=True, help="clip frames for video model")
-    arg("--classes", type=int, choices=(400, 487), required=True, help="classes in last layer")
+    arg("--classes", type=int, choices=(359, 400, 487), required=True, help="classes in last layer")
     arg("--batch-size", type=int, default=1, help="number of sequences per batch for inference")
     arg("--num-workers", type=int, default=0, help="number of workers for data loading")
     arg("--labels", type=Path, help="JSON file with label map array")
