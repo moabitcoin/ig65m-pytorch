@@ -1,5 +1,4 @@
 numpy
-torch
-torchvision
 opencv-contrib-python-headless
 einops
+pillow

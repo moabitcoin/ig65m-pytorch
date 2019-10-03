@@ -1,47 +1,18 @@
-#!/usr/bin/env python3
-
+import sys
 import pickle
-import argparse
-from pathlib import Path
 
 import torch
 import torch.nn as nn
 
-from torchvision.models.video.resnet import VideoResNet, BasicBlock, R2Plus1dStem, Conv2Plus1D
+from torchvision.models.video.resnet import BasicBlock, R2Plus1dStem, Conv2Plus1D
+
+from ig65m.models import r2plus1d_34
 
 
-def r2plus1d_34(num_classes, pretrained=False, progress=False, **kwargs):
-    model = VideoResNet(block=BasicBlock,
-                        conv_makers=[Conv2Plus1D] * 4,
-                        layers=[3, 4, 6, 3],
-                        stem=R2Plus1dStem)
-
-    model.fc = nn.Linear(model.fc.in_features, out_features=num_classes)
-
-    # Fix difference in PyTorch vs Caffe2 architecture
-    # https://github.com/facebookresearch/VMZ/issues/89
-    model.layer2[0].conv2[0] = Conv2Plus1D(128, 128, 288)
-    model.layer3[0].conv2[0] = Conv2Plus1D(256, 256, 576)
-    model.layer4[0].conv2[0] = Conv2Plus1D(512, 512, 1152)
-
-    # We need exact Caffe2 momentum for BatchNorm scaling
-    for m in model.modules():
-        if isinstance(m, nn.BatchNorm3d):
-            m.eps = 1e-3
-            m.momentum = 0.9
-
-    return model
-
-
-def blobs_from_pkl(path, num_classes):
+def blobs_from_pkl(path):
     with path.open(mode="rb") as f:
         pkl = pickle.load(f, encoding="latin1")
         blobs = pkl["blobs"]
-
-        assert "last_out_L" + str(num_classes) + "_w" in blobs, \
-            "Number of --classes argument doesnt matche the last linear layer in pkl"
-        assert "last_out_L" + str(num_classes) + "_b" in blobs, \
-            "Number of --classes argument doesnt matche the last linear layer in pkl"
 
         return blobs
 
@@ -168,7 +139,13 @@ def check_canary(model):
 
 
 def main(args):
-    blobs = blobs_from_pkl(args.pkl, args.classes)
+    blobs = blobs_from_pkl(args.pkl)
+
+    if not "last_out_L{}_w".format(args.classes) in blobs:
+        sys.exit("Number of --classes does not match the last linear layer in .pkl blobs")
+
+    if not "last_out_L{}_b".format(args.classes) in blobs:
+        sys.exit("Number of --classes does not match the last linear layer in .pkl blobs")
 
     model = r2plus1d_34(num_classes=args.classes)
 
@@ -197,15 +174,3 @@ def main(args):
 
     model = r2plus1d_34(num_classes=args.classes)
     model.load_state_dict(torch.load(args.out.with_suffix(".pth")))
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    arg = parser.add_argument
-
-    arg("pkl", type=Path, help=".pkl file to read the R(2+1)D 34 layer weights from")
-    arg("out", type=Path, help="prefix to save converted R(2+1)D 34 layer weights to")
-    arg("--frames", type=int, choices=(8, 32), required=True, help="clip frames for video model")
-    arg("--classes", type=int, choices=(359, 400, 487), required=True, help="classes in last layer")
-
-    main(parser.parse_args())

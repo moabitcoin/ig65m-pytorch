@@ -11,7 +11,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 COPY requirements.txt .
 
 RUN python3 -m venv /opt/venv && \
-    python3 -m pip install pip==19.2.3 pip-tools==4.0.0 && \
-    python3 -m piptools sync
+    python3 -m pip install pip==19.2.3 pip-tools==4.0.0
+
+RUN echo "https://download.pytorch.org/whl/cu100/torch-1.2.0-cp36-cp36m-manylinux1_x86_64.whl       \
+          --hash=sha256:a13bf6f78a49d844b85c142b8cd62d2e1833a11ed21ea0bc6b1ac73d24c76415            \
+          \n                                                                                        \
+          https://download.pytorch.org/whl/cu100/torchvision-0.4.0-cp36-cp36m-manylinux1_x86_64.whl \
+          --hash=sha256:2f67efdf6edd9ea7f9cd9a3917ae5c63d5684e3bdb5cc9c2b364c15bdfe4456b            \
+          \n" >> requirements.txt
+
+RUN python3 -m piptools sync
 
 COPY . .
