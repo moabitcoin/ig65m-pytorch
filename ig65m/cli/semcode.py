@@ -13,7 +13,7 @@ def main(args):
     assert features.shape[1] == 512
     assert features.dtype == np.float32
 
-    h, w = features.shape
+    w, h = features.shape
 
     image = Image.new(mode="HSV", size=(w, h))
 
@@ -32,15 +32,15 @@ def main(args):
         v = np.ones(512, dtype=np.uint8) * 255
 
         hsv = np.array((h, s, v))
-        hsv = rearrange(hsv, "c h -> () h c")
+        hsv = rearrange(hsv, "c h -> h () c")
 
-        assert hsv.shape == (1, 512, 3)
+        assert hsv.shape == (512, 1, 3)
         assert hsv.dtype == np.uint8
 
         strip = Image.fromarray(hsv, mode="HSV")
-        assert strip.size == (512, 1)
+        assert strip.size == (1, 512)
 
-        image.paste(strip, box=(0, i))
+        image.paste(strip, box=(i, 0))
 
     image.convert("RGB").save(args.image, optimize=True)
     print("🔰 Done", file=sys.stderr)
