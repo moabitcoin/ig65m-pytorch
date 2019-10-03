@@ -22,7 +22,7 @@ class Resize:
             scale = float(size) / min(video.shape[-2:])
             size = None
 
-        return nn.functional.interpolate(video, size=self.size, scale_factor=scale,
+        return nn.functional.interpolate(video, size=size, scale_factor=scale,
                                          mode=self.mode, align_corners=False)
 
 
@@ -31,8 +31,13 @@ class CenterCrop:
         self.size = size
 
     def __call__(self, video):
+        size = self.size
+
+        if isinstance(size, int):
+            size = size, size
+
+        th, tw = size
         h, w = video.shape[-2:]
-        th, tw = self.size
 
         i = int(round((h - th) / 2.))
         j = int(round((w - tw) / 2.))

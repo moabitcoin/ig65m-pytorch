@@ -69,6 +69,9 @@ class VideoDataset(IterableDataset):
         self.first = 0
         self.last = frames
 
+    def __len__(self):
+        return self.last // self.clip
+
     def __iter__(self):
         info = get_worker_info()
 

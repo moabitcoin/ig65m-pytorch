@@ -25,7 +25,7 @@ def r2plus1d_34_8_ig65m(num_classes, pretrained=False, progress=False):
                        pretrained=pretrained, progress=progress)
 
 
-def r2plus1d_34_32_ig65m(num_classes, pretrained=False, progress=False, **kwargs):
+def r2plus1d_34_32_ig65m(num_classes, pretrained=False, progress=False):
     """R(2+1)D 34-layer IG65M model for clips of length 32 frames.
 
     Args:
@@ -38,7 +38,7 @@ def r2plus1d_34_32_ig65m(num_classes, pretrained=False, progress=False, **kwargs
                        pretrained=pretrained, progress=progress)
 
 
-def r2plus1d_34_8_kinetics(num_classes, pretrained=False, progress=False, **kwargs):
+def r2plus1d_34_8_kinetics(num_classes, pretrained=False, progress=False):
     """R(2+1)D 34-layer IG65M-Kinetics model for clips of length 8 frames.
 
     Args:
@@ -51,7 +51,7 @@ def r2plus1d_34_8_kinetics(num_classes, pretrained=False, progress=False, **kwar
                        pretrained=pretrained, progress=progress)
 
 
-def r2plus1d_34_32_kinetics(num_classes, pretrained=False, progress=False, **kwargs):
+def r2plus1d_34_32_kinetics(num_classes, pretrained=False, progress=False):
     """R(2+1)D 34-layer IG65M-Kinetics model for clips of length 32 frames.
 
     Args:

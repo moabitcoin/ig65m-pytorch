@@ -53,4 +53,12 @@ webcam:
 w: webcam
 
 
-.PHONY: install i run r update u webcam w gpu g
+publish:
+	@docker image save $(dockerimage) \
+	  | pv -N "Publish $(dockerimage) to $(sshopts)" -s $(shell docker image inspect $(dockerimage) --format "{{.Size}}") \
+	  | ssh $(sshopts) "docker image load"
+
+p: publish
+
+
+.PHONY: install i run r update u webcam w gpu g publish p

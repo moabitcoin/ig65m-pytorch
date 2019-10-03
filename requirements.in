@@ -2,3 +2,4 @@ numpy
 opencv-contrib-python-headless
 einops
 pillow
+tqdm
