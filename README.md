@@ -3,6 +3,8 @@
 Unofficial PyTorch (and ONNX) 3D video classification models and weights pre-trained on IG-65M (65MM Instagram videos).
 The official Facebook Research Caffe2 model and weights are available [here](https://github.com/facebookresearch/vmz).
 
+[![Build Status](https://travis-ci.org/moabitcoin/ig65m-pytorch.svg?branch=master)](https://travis-ci.org/moabitcoin/ig65m-pytorch)
+
 
 ## PyTorch and ONNX Models :trophy:
 

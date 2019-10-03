@@ -1,0 +1,21 @@
+language: generic
+sudo: required
+dist: trusty
+
+services:
+  - docker
+
+matrix:
+  fast_finish: true
+
+  include:
+    - os: linux
+
+before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update && sudo apt-get -y install docker-ce
+  - docker build -t $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT -f Dockerfile.cpu .
+
+script:
+  - docker run --ipc=host --rm $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT
