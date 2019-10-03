@@ -3,6 +3,7 @@ from pathlib import Path
 
 import ig65m.cli.convert
 import ig65m.cli.extract
+import ig65m.cli.semcode
 
 
 parser = argparse.ArgumentParser(prog="ig65m")
@@ -28,6 +29,13 @@ extract.add_argument("--batch-size", type=int, default=1, help="number of sequen
 extract.add_argument("--pool-spatial", type=str, choices=("mean", "max"), default="mean", help="spatial pooling")
 extract.add_argument("--pool-temporal", type=str, choices=("mean", "max"), default="mean", help="temporal pooling")
 extract.set_defaults(main=ig65m.cli.extract.main)
+
+
+semcode = subcmd.add_parser("semcode", help="🔰 generates semantic codes", formatter_class=Formatter)
+semcode.add_argument("features", type=Path, help="file to read video features from")
+semcode.add_argument("image", type=Path, help="file to save semantic code image to")
+semcode.set_defaults(main=ig65m.cli.semcode.main)
+
 
 
 args = parser.parse_args()
