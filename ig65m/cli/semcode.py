@@ -13,12 +13,11 @@ def main(args):
     assert features.shape[1] == 512
     assert features.dtype == np.float32
 
-    w, h = features.shape
+    features /= features.max()
 
-    image = Image.new(mode="HSV", size=(w, h))
+    image = Image.new(mode="HSV", size=features.shape)
 
     for i, feature in enumerate(features):
-        feature = feature / np.linalg.norm(feature)
         assert (feature >= 0).all()
         assert (feature <= 1).all()
         assert feature.dtype == np.float32
@@ -26,9 +25,8 @@ def main(args):
         # Map color values in HSV color space
         # Range for H, S, V is [0, 255] uint8
 
-        h = ((feature * 255 + 20) % 255).astype(np.uint8)
-
-        s = np.ones(512, dtype=np.uint8) * 128
+        h = np.ones(512, dtype=np.uint8) * 20
+        s = (feature * 255).astype(np.uint8)
         v = np.ones(512, dtype=np.uint8) * 255
 
         hsv = np.array((h, s, v))

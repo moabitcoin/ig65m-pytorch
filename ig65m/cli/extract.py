@@ -16,7 +16,7 @@ from ig65m.transforms import ToTensor, Resize, CenterCrop, Normalize
 
 
 class VideoModel(nn.Module):
-    def __init__(self, pool_spatial="avg", pool_temporal="avg"):
+    def __init__(self, pool_spatial="mean", pool_temporal="mean"):
         super().__init__()
 
         self.model = r2plus1d_34_32_ig65m(num_classes=359, pretrained=True, progress=True)
