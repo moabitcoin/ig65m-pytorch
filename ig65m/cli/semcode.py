@@ -25,7 +25,7 @@ def main(args):
         # Map color values in HSV color space
         # Range for H, S, V is [0, 255] uint8
 
-        h = np.ones(512, dtype=np.uint8) * 20
+        h = np.ones(512, dtype=np.uint8) * int(args.color / 360 * 255)
         s = (feature * 255).astype(np.uint8)
         v = np.ones(512, dtype=np.uint8) * 255
 

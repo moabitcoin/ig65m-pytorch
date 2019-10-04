@@ -34,6 +34,7 @@ extract.set_defaults(main=ig65m.cli.extract.main)
 semcode = subcmd.add_parser("semcode", help="🔰 generates semantic codes", formatter_class=Formatter)
 semcode.add_argument("features", type=Path, help="file to read video features from")
 semcode.add_argument("image", type=Path, help="file to save semantic code image to")
+semcode.add_argument("--color", type=int, default=20, help="HSV hue in angle [0, 360]")
 semcode.set_defaults(main=ig65m.cli.semcode.main)
 
 
