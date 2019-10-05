@@ -43,7 +43,6 @@ semcode.set_defaults(main=ig65m.cli.semcode.main)
 dreamer = subcmd.add_parser("dreamer", help="💤 dream of electric sheep", formatter_class=Formatter)
 dreamer.add_argument("image", type=Path, help="file to save dream image to")
 dreamer.add_argument("--num-epochs", type=int, required=True, help="how many epochs to dream")
-dreamer.add_argument("--batch-size", type=int, default=1, help="number of sequences per batch")
 dreamer.set_defaults(main=ig65m.cli.dreamer.main)
 
 
