@@ -63,6 +63,9 @@ class ElectricSheepLoss(nn.Module):
 
         model = r2plus1d_34_32_ig65m(num_classes=359, pretrained=True, progress=True)
 
+        for params in model.parameters():
+            params.requires_grad = False
+
         model = model.to(device)
         model = nn.DataParallel(model)
         model.eval()
