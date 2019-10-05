@@ -25,16 +25,18 @@ def main(args):
     criterion = ElectricSheepLoss(device)
     optimizer = torch.optim.Adam([dream], lr=1e-4)
 
+    progress = tqdm(range(args.num_epochs))
 
-    for epoch in tqdm(range(args.num_epochs)):
+    for epoch in progress:
         optimizer.zero_grad()
 
         loss = criterion(dream)
 
-        print("epoch: {} loss: {}".format(epoch, loss.item()))
+        progress.set_postfix({"epoch": epoch, "loss": loss.item()})
 
         loss.backward()
         optimizer.step()
+
 
     # dream = rearrange(dream, "() c t h w -> t h w c")
     # for image in dream:
