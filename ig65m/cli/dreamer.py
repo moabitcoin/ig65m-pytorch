@@ -38,13 +38,12 @@ def main(args):
         optimizer.step()
 
 
-    # dream = rearrange(dream, "() c t h w -> t h w c")
-    # for image in dream:
-    #     image = Image.fromarray(image, mode="RGB")
-    #
-    # TODO: how to animate?
-    #
-    # image.save(args.image, optimize=True)
+    dream = rearrange(dream, "() c t h w -> t h w c")
+    dream = dream.data.cpu().numpy()
+
+    images = [Image.fromarray(v, mode="RGB") for v in dream]
+
+    images[0].save(args.image, format="GIF", append_images=images[1:], save_all=True, duration=1000, loop=1)
 
     print("💤 Done", file=sys.stderr)
 
