@@ -79,5 +79,9 @@ class ElectricSheepLoss(nn.Module):
 
     def forward(self, inputs):
         x = self.model.module.stem(inputs)
+        #x = self.model.module.layer1(x)
+        #x = self.model.module.layer2(x)
+        #x = self.model.module.layer3(x)
+        #x = self.model.module.layer4(x)
 
         return (-1. * x).mean()
