@@ -9,6 +9,7 @@ from tqdm import tqdm
 from einops import rearrange
 
 from ig65m.models import r2plus1d_34_32_ig65m
+from ig65m.transforms import Normalize
 
 
 def main(args):
@@ -26,12 +27,16 @@ def main(args):
     criterion = ElectricSheepLoss(device)
     optimizer = torch.optim.Adam([dream], lr=1e-4)
 
+    normalize = Normalize(mean=[0.43216, 0.394666, 0.37645],
+                          std=[0.22803, 0.22145, 0.216989])
+
     progress = tqdm(range(args.num_epochs))
 
     for epoch in progress:
         optimizer.zero_grad()
 
         rgb = dream.clamp(min=0, max=1)
+        rgb = normalize(rgb)
 
         loss = criterion(rgb)
 
