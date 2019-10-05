@@ -21,10 +21,11 @@ def main(args):
         print("🐌 Running on CPU(s)", file=sys.stderr)
         device = torch.device("cpu")
 
-
-    dream = torch.rand(1, 3, 32, 112, 112, requires_grad=True, device=device)
+    dream = torch.rand(3, 32, 112, 112, requires_grad=True, device=device)
 
     criterion = ElectricSheepLoss(device)
+    regularize = TotalVariationLoss(device)
+
     optimizer = torch.optim.Adam([dream], lr=args.lr)
 
     normalize = Normalize(mean=[0.43216, 0.394666, 0.37645],
@@ -38,15 +39,20 @@ def main(args):
         rgb = dream.clamp(min=0, max=1)
         rgb = normalize(rgb)
 
-        loss = criterion(rgb)
+        batch = rearrange(rgb, "c t h w -> () c t h w")
 
-        progress.set_postfix({"epoch": epoch, "loss": loss.item()})
+        act = criterion(batch)
+        reg = regularize(batch)
+
+        loss = 1. * act + 1e-4 * reg
 
         loss.backward()
         optimizer.step()
 
+        progress.set_postfix({"loss": loss.item(), "act": act.item(), "reg": reg.item()})
 
-    dream = rearrange(dream, "() c t h w -> t h w c")
+
+    dream = rearrange(dream, "c t h w -> t h w c")
     dream = dream.clamp(min=0, max=1)
     dream = dream.data.cpu().numpy()
 
@@ -84,4 +90,22 @@ class ElectricSheepLoss(nn.Module):
         #x = self.model.module.layer3(x)
         #x = self.model.module.layer4(x)
 
-        return (-1. * x).mean()
+        c = 0  # maximize TxHxW volume activations for single channel
+
+        loss = (-1 * x[:, c, :, :, :]).mean()
+
+        return loss
+
+
+class TotalVariationLoss(nn.Module):
+    def __init__(self, device):
+        super().__init__()
+
+    def forward(self, inputs):
+        dt = torch.sum(torch.abs(inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]))
+        dh = torch.sum(torch.abs(inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]))
+        dw = torch.sum(torch.abs(inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]))
+
+        loss = dt + dh + dw
+
+        return loss
