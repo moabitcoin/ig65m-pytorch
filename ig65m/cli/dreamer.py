@@ -25,7 +25,7 @@ def main(args):
     dream = torch.rand(1, 3, 32, 112, 112, requires_grad=True, device=device)
 
     criterion = ElectricSheepLoss(device)
-    optimizer = torch.optim.Adam([dream], lr=1e-4)
+    optimizer = torch.optim.Adam([dream], lr=args.lr)
 
     normalize = Normalize(mean=[0.43216, 0.394666, 0.37645],
                           std=[0.22803, 0.22145, 0.216989])
@@ -57,7 +57,7 @@ def main(args):
 
     images = [Image.fromarray(v, mode="RGB") for v in dream]
 
-    images[0].save(args.image, format="GIF", append_images=images[1:], save_all=True, duration=1000, loop=1)
+    images[0].save(args.image, format="GIF", append_images=images[1:], save_all=True, duration=(1000 / 30), loop=1)
 
     print("💤 Done", file=sys.stderr)
 
