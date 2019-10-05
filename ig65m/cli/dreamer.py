@@ -20,7 +20,7 @@ def main(args):
         device = torch.device("cpu")
 
 
-    dream = torch.rand(1, 3, 32, 112, 112, requires_grad=True)
+    dream = torch.rand(1, 3, 32, 112, 112, requires_grad=True, device=device)
 
     criterion = ElectricSheepLoss(device)
     optimizer = torch.optim.Adam([dream], lr=1e-4)
