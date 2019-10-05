@@ -3,6 +3,7 @@ import sys
 import torch
 import torch.nn as nn
 
+import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from einops import rearrange
@@ -30,7 +31,9 @@ def main(args):
     for epoch in progress:
         optimizer.zero_grad()
 
-        loss = criterion(dream)
+        rgb = dream.clamp(min=0, max=1)
+
+        loss = criterion(rgb)
 
         progress.set_postfix({"epoch": epoch, "loss": loss.item()})
 
@@ -39,7 +42,13 @@ def main(args):
 
 
     dream = rearrange(dream, "() c t h w -> t h w c")
+    dream = dream.clamp(min=0, max=1)
     dream = dream.data.cpu().numpy()
+
+    assert (dream >= 0).all()
+    assert (dream <= 1).all()
+
+    dream = (dream * 255).astype(np.uint8)
 
     images = [Image.fromarray(v, mode="RGB") for v in dream]
 
