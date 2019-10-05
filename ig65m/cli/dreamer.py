@@ -24,7 +24,7 @@ def main(args):
     dream = torch.rand(3, 32, 112, 112, requires_grad=True, device=device)
 
     criterion = ElectricSheepLoss(device)
-    regularize = TotalVariationLoss(device)
+    regularize = TotalVariationLoss(args.gamma)
 
     optimizer = torch.optim.Adam([dream], lr=args.lr)
 
@@ -85,7 +85,7 @@ class ElectricSheepLoss(nn.Module):
 
     def forward(self, inputs):
         x = self.model.module.stem(inputs)
-        #x = self.model.module.layer1(x)
+        x = self.model.module.layer1(x)
         #x = self.model.module.layer2(x)
         #x = self.model.module.layer3(x)
         #x = self.model.module.layer4(x)
@@ -98,14 +98,16 @@ class ElectricSheepLoss(nn.Module):
 
 
 class TotalVariationLoss(nn.Module):
-    def __init__(self, device):
+    def __init__(self, gamma):
         super().__init__()
 
-    def forward(self, inputs):
-        dt = torch.sum(torch.abs(inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]))
-        dh = torch.sum(torch.abs(inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]))
-        dw = torch.sum(torch.abs(inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]))
+        self.gamma = gamma
 
-        loss = dt + dh + dw
+    def forward(self, inputs):
+        loss = 0.
+
+        loss += self.gamma * (inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]).abs().sum()
+        loss += self.gamma * (inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]).abs().sum()
+        loss += self.gamma * (inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]).abs().sum()
 
         return loss

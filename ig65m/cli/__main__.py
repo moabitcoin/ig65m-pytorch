@@ -44,6 +44,7 @@ dreamer = subcmd.add_parser("dreamer", help="💤 dream of electric sheep", form
 dreamer.add_argument("image", type=Path, help="file to save dream animation to")
 dreamer.add_argument("--lr", type=float, default=1e-2, help="how lucid the dream is")
 dreamer.add_argument("--num-epochs", type=int, default=100, help="how long to dream")
+dreamer.add_argument("--gamma", type=float, default=1e-5, help="total variation term")
 dreamer.set_defaults(main=ig65m.cli.dreamer.main)
 
 
