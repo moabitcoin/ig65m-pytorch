@@ -44,7 +44,7 @@ def main(args):
         act = criterion(batch)
         reg = regularize(batch)
 
-        loss = 1. * act + 1e-4 * reg
+        loss = act + reg
 
         loss.backward()
         optimizer.step()
