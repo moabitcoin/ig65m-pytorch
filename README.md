@@ -1,9 +1,13 @@
-# IG-65M PyTorch
+<h1 align='center'>IG-65M PyTorch</h1>
 
-Unofficial PyTorch (and ONNX) 3D video classification models and weights pre-trained on IG-65M (65MM Instagram videos).
-The official Facebook Research Caffe2 model and weights are available [here](https://github.com/facebookresearch/vmz).
+<p align=center>
+  Unofficial PyTorch (and ONNX) 3D video classification models and weights pre-trained on IG-65M (65MM Instagram videos).
 
-[![Build Status](https://travis-ci.org/moabitcoin/ig65m-pytorch.svg?branch=master)](https://travis-ci.org/moabitcoin/ig65m-pytorch)
+  <img src="assets/primer.png" alt="IG-65M activations for the Primer movie trailer video; time goes top to bottom" />
+  <i>IG-65M activations for the Primer movie trailer video; time goes top to bottom</i>
+</p>
+
+<p align="center"><a href="https://travis-ci.org/moabitcoin/ig65m-pytorch"><img src="https://travis-ci.org/moabitcoin/ig65m-pytorch.svg?branch=master" /></a></p>
 
 
 ## PyTorch and ONNX Models :trophy:
@@ -23,6 +27,7 @@ Notes
 - Models fine-tuned on Kinetics have 400 classes, the plain IG65 models 487 (32 clips), and 359 (8 clips) classes.
 - For models fine-tuned on Kinetics you can use the labels from [here](https://github.com/Showmax/kinetics-downloader/blob/68bd8bc3b9e30da83db9e34cb7d867dcda705cb4/resources/classes.json).
 - For plain IG65 models there is no label map available.
+- Official Facebook Research Caffe2 models are [here](https://github.com/facebookresearch/vmz).
 
 
 ## Usage :computer:
