@@ -63,7 +63,7 @@ def main(args):
 
     images = [Image.fromarray(v, mode="RGB") for v in dream]
 
-    images[0].save(args.image, format="GIF", append_images=images[1:], save_all=True, duration=(1000 / 30), loop=1)
+    images[0].save(args.image, format="GIF", append_images=images[1:], save_all=True, duration=(1000 / 30), loop=0)
 
     print("💤 Done", file=sys.stderr)
 
