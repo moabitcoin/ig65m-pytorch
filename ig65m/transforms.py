@@ -57,3 +57,17 @@ class Normalize:
         std = torch.as_tensor(self.std, device=video.device).reshape(shape)
 
         return (video - mean) / std
+
+
+class Denormalize:
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, video):
+        shape = (-1,) + (1,) * (video.dim() - 1)
+
+        mean = torch.as_tensor(self.mean, device=video.device).reshape(shape)
+        std = torch.as_tensor(self.std, device=video.device).reshape(shape)
+
+        return (video * std) + mean

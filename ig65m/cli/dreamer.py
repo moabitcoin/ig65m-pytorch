@@ -9,7 +9,7 @@ from tqdm import tqdm
 from einops import rearrange
 
 from ig65m.models import r2plus1d_34_32_ig65m
-from ig65m.transforms import Normalize
+from ig65m.transforms import Denormalize
 
 
 def main(args):
@@ -21,28 +21,25 @@ def main(args):
         print("🐌 Running on CPU(s)", file=sys.stderr)
         device = torch.device("cpu")
 
-    dream = torch.rand(3, 32, 112, 112, requires_grad=True, device=device)
+    dream = torch.rand(1, 3, 32, 112, 112, requires_grad=True, device=device)
 
     criterion = ElectricSheepLoss(device)
-    regularize = TotalVariationLoss(args.gamma)
+    regularize = TotalVariationLoss()
 
     optimizer = torch.optim.Adam([dream], lr=args.lr)
 
-    normalize = Normalize(mean=[0.43216, 0.394666, 0.37645],
-                          std=[0.22803, 0.22145, 0.216989])
+    mean, std = [0.43216, 0.394666, 0.37645], [0.22803, 0.22145, 0.216989]
+    denormalize = Denormalize(mean=mean, std=std)
 
     progress = tqdm(range(args.num_epochs))
 
     for epoch in progress:
+        video = dream.clamp(-1, 1)
+
         optimizer.zero_grad()
 
-        rgb = dream.clamp(min=0, max=1)
-        rgb = normalize(rgb)
-
-        batch = rearrange(rgb, "c t h w -> () c t h w")
-
-        act = criterion(batch)
-        reg = regularize(batch)
+        act = criterion(video)
+        reg = regularize(video) * args.gamma
 
         loss = act + reg
 
@@ -51,11 +48,14 @@ def main(args):
 
         progress.set_postfix({"loss": loss.item(), "act": act.item(), "reg": reg.item()})
 
-
+    dream = dream.clamp(-1, 1)
+    dream = rearrange(dream, "() c t h w -> c t h w")
+    dream = denormalize(dream)
     dream = rearrange(dream, "c t h w -> t h w c")
-    dream = dream.clamp(min=0, max=1)
     dream = dream.data.cpu().numpy()
 
+    assert dream.shape == (32, 112, 112, 3)
+    assert dream.dtype == np.float32
     assert (dream >= 0).all()
     assert (dream <= 1).all()
 
@@ -85,29 +85,27 @@ class ElectricSheepLoss(nn.Module):
 
     def forward(self, inputs):
         x = self.model.module.stem(inputs)
-        x = self.model.module.layer1(x)
+        #x = self.model.module.layer1(x)
         #x = self.model.module.layer2(x)
         #x = self.model.module.layer3(x)
         #x = self.model.module.layer4(x)
 
-        c = 0  # maximize TxHxW volume activations for single channel
+        # TODO: pick i to maximize x[:, i, :, :, :]
 
-        loss = (-1 * x[:, c, :, :, :]).mean()
+        loss = (-1 * x[:, :, :, :, :]).mean()
 
         return loss
 
 
 class TotalVariationLoss(nn.Module):
-    def __init__(self, gamma):
+    def __init__(self):
         super().__init__()
-
-        self.gamma = gamma
 
     def forward(self, inputs):
         loss = 0.
 
-        loss += self.gamma * (inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]).abs().sum()
-        loss += self.gamma * (inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]).abs().sum()
-        loss += self.gamma * (inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]).abs().sum()
+        loss += (inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]).abs().sum() / inputs.numel()
+        loss += (inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]).abs().sum() / inputs.numel()
+        loss += (inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]).abs().sum() / inputs.numel()
 
         return loss
