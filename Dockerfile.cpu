@@ -23,3 +23,6 @@ RUN echo "https://download.pytorch.org/whl/cpu/torch-1.2.0%2Bcpu-cp36-cp36m-many
 RUN python3 -m piptools sync
 
 COPY . .
+
+ENTRYPOINT ["/usr/src/app/bin/ig65m"]
+CMD ["-h"]
