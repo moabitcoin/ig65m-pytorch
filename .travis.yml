@@ -1,6 +1,6 @@
 language: generic
 sudo: required
-dist: trusty
+dist: bionic
 
 services:
   - docker
@@ -15,6 +15,9 @@ matrix:
 
   include:
     - os: linux
+      addons:
+        apt:
+          packages: ['wget', 'ffmpeg']
 
 before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -22,5 +25,18 @@ before_install:
   - sudo apt-get update && sudo apt-get -y install docker-ce
   - docker build -t $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT -f Dockerfile.cpu .
 
+  - wget https://www.dropbox.com/s/6xwyu1az6oy4ts7/r2plus1d_34_clip8_ig65m_from_scratch_f79708462.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ig65m_from_scratch.pkl
+  - wget https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl
+  - wget https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ig65m_from_scratch.pkl
+  - wget https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl
+
 script:
-  - docker run --rm --ipc=host -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT
+  - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip8_ig65m_from_scratch.pkl /tmp/r2plus1d_34_clip8_ig65m_from_scratch --frames 8 --classes 487
+  - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl /tmp/r2plus1d_34_clip8_ft_kinetics_from_ig65m --frames 8 --classes 400
+  - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip32_ig65m_from_scratch.pkl /tmp/r2plus1d_34_clip32_ig65m_from_scratch --frames 32 --classes 359
+  - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl /tmp/r2plus1d_34_clip32_ft_kinetics_from_ig65m --frames 32 --classes 400
+
+  - ffmpeg -f lavfi -i testsrc=duration=10:size=112x112:rate=30 video.mp4
+  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT extract /data/video.mp4 /data/features.npy
+
+  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT semcode /data/features.npy /data/semcode.png
