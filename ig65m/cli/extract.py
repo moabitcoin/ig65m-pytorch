@@ -56,9 +56,8 @@ def main(args):
     transform = Compose([
         ToTensor(),
         Rearrange("t h w c -> c t h w"),
-        Resize(128),
+        Resize(args.frame_size),
         Normalize(mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]),
-        CenterCrop(112),
     ])
 
     # dataset = WebcamDataset(clip=32, transform=transform)
@@ -69,9 +68,6 @@ def main(args):
     features = []
 
     for inputs in tqdm(loader, total=len(dataset) // args.batch_size):
-        # NxCxTxHxW
-        assert inputs.size() == (args.batch_size, 3, 32, 112, 112)
-
         inputs = inputs.to(device)
 
         outputs = model(inputs)
