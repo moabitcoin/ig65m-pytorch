@@ -19,6 +19,11 @@ matrix:
         apt:
           packages: ['wget', 'ffmpeg']
 
+env:
+  global:
+  - secure: Wku4Wz/LFyRUe49M1oD1/fa3IBBPua2jXq4yWf3H4XzJMdDkUxc28cfd9TXydqWYJE9YG7K+0vkkypazgaY5OMMEEHqpgCob5nhL6fCEPrLV2s12XLGm2d0dStiwvhYQlhpOU32/DGty5jRWT1R3kRfK0vj5Ji60ETZ2A6NIokQ6pb67YuItksjm72NnJ2DMeM/ugM62ujj1VMdHzUrvjGKSfhNJpsreJQZEHbfTtGcYit+AjAn0UyzglcKPBnXGfpdZ04DtVyXh9p+oVXU0pKMYLVd4Hvc8I0eUX9NeISYbxQO3XP3hvXwr6G3FO5YSMuYXBQYPfKkpfZ8hgYIFHWy+IDxh6i0CGtlkIitoc+spEfoOo7HqXT8hvhiEFVkbG1FJ85mmxR67MqiWWudP5WUdlfJRLVa/VD0T33rXnILQ2P+DtCYfd6YbqmdhaHZbI4MEhPTjBuxEaR2IS3jMV8vNEEAKnqCXYp7kjTjIT2SgC9PlVutmZJZy454Fpzo72Aua48gYSj+OlSqTYXCYJKy+LzeUCX33+VXheHIpDv/Rg9M/PSzKTogCmhfdVTAn30+AgA67oMAEuZiFiZ0vpr90bOnaQ6z637VJx9A6nB2vuZQTdwMgLmsdI3TvEN2Cf64l56PVeErZGb0Q0Mux1mfpkUhBlEIq8uf5P2fvoCQ=
+  - secure: Hw1YoVh3xXRTLNXzMh6RdUKhdS9+z4pKWKEhknDSYN0+A/m94xFoXPJMuvuPx9kiFiWNCFGlZmzu8UAO5rRM/sklhwHBTyRMEXWGwxCeitnC4CYqYkjcvAYKjOPPM+N6a7eu1SeBcMikTChYsiHKBI+rkL3z9qPSVHmizm6dn/IaWI2hXptpc/ZGm88qparoyO2pzrGMY0qANIRGPSAUyPYUasFlJN3uUwQHbxBZ3M9Dwynqw0IB5huw6uErFsdBsAeqWZVjpBL/IAV01d7RGorhsM1RhOTDKABJfkPvHolGUKRjGpOEFEOZcuiME8o9fG989SdA86EkwPID4Aq7IHmKARn1fzdI8afM0PSgPfAU+R1Sp+ERAXbSlm2Y8e1nytPvQ5T1+B8cC6f0FSXeqrBSQr3EgkOkf120E/zYCzjmgppgsK1sOwiuAszo5yDEXPf+0xo7WBwF/L/30FDgwP3lSgwXLbxpzmbi/BPtIqOD26teuVW3c0sVXKOn+p0e9/gcaelNm46JaQFwxrI4cCLOFo9dbdRkqFOwpyoAncVr4Vs5N49ShzPesmfdVMODqnjpMiKRRchAb5B77q63P9YdldMOVzB3OEZ6bQMpxaJYdVXQwOovAK19xG/utxiTJcd4mBe8apvFGymO4f43Y1o/J88NH4uwJvapBCgSsh0=
+
 before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -40,3 +45,25 @@ script:
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT extract /data/video.mp4 /data/features.npy
 
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT semcode /data/features.npy /data/semcode.png
+
+after_success:
+  - |
+    if [[ $TRAVIS_BRANCH == "master" ]]; then
+      make dockerfile=Dockerfile.cpu dockerimage=$TRAVIS_REPO_SLUG:latest-cpu
+      make dockerfile=Dockerfile.gpu dockerimage=$TRAVIS_REPO_SLUG:latest-gpu
+
+      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      docker push $TRAVIS_REPO_SLUG:latest-cpu
+      docker push $TRAVIS_REPO_SLUG:latest-gpu
+    fi
+  - |
+    if [[ ! -z $TRAVIS_TAG ]]; then
+      make dockerfile=Dockerfile.cpu dockerimage=$TRAVIS_REPO_SLUG:$TRAVIS_TAG-cpu
+      make dockerfile=Dockerfile.gpu dockerimage=$TRAVIS_REPO_SLUG:$TRAVIS_TAG-gpu
+
+      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      docker push $TRAVIS_REPO_SLUG:$TRAVIS_TAG-cpu
+      docker push $TRAVIS_REPO_SLUG:$TRAVIS_TAG-gpu
+    fi
