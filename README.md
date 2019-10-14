@@ -10,41 +10,34 @@
 <p align="center"><a href="https://travis-ci.org/moabitcoin/ig65m-pytorch"><img src="https://travis-ci.org/moabitcoin/ig65m-pytorch.svg?branch=master" /></a></p>
 
 
-## PyTorch and ONNX Models :trophy:
-
-We provide converted `.pth` and `.pb` PyTorch and ONNX weights, respectively.
-
-
-| Model         | Pretrain\+Finetune       | Input Size | pth                                            | onnx                                       | caffe2                                                            |
-|---------------|:-------------------------|:-----------|:-----------------------------------------------|:-------------------------------------------|:------------------------------------------------------------------|
-|  R(2+1)D_34   | IG-65M + None            |  8x112x112 | [r2plus1d_34_clip8_ig65m_from_scratch-9bae36ae.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch-9bae36ae.pth)           | [r2plus1d_34_clip8_ig65m_from_scratch-748ab053.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch-748ab053.pb)           | [r2plus1d_34_clip8_ig65m_from_scratch.pkl](https://www.dropbox.com/s/6xwyu1az6oy4ts7/r2plus1d_34_clip8_ig65m_from_scratch_f79708462.pkl)               |
-|  R(2+1)D_34   | IG-65M + Kinetics        |  8x112x112 | [r2plus1d_34_clip8_ft_kinetics_from_ig65m-0aa0550b.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m-0aa0550b.pth)   | [r2plus1d_34_clip8_ft_kinetics_from_ig65m-625d61b3.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m-625d61b3.pb)   | [r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl](https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl)   |
-|  R(2+1)D_34   | IG-65M + None            | 32x112x112 | [r2plus1d_34_clip32_ig65m_from_scratch-449a7af9.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch-449a7af9.pth)         | [r2plus1d_34_clip32_ig65m_from_scratch-e304d648.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch-e304d648.pb)         | [r2plus1d_34_clip32_ig65m_from_scratch.pkl](https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl)            |
-|  R(2+1)D_34   | IG-65M + Kinetics        | 32x112x112 | [r2plus1d_34_clip32_ft_kinetics_from_ig65m-ade133f1.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m-ade133f1.pth) | [r2plus1d_34_clip32_ft_kinetics_from_ig65m-10f4c3bf.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m-10f4c3bf.pb) | [r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl](https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl) |
-
-Notes
-- ONNX models provided here have not been optimized for inference.
-- Models fine-tuned on Kinetics have 400 classes, the plain IG65 models 487 (32 clips), and 359 (8 clips) classes.
-- For models fine-tuned on Kinetics you can use the labels from [here](https://github.com/Showmax/kinetics-downloader/blob/68bd8bc3b9e30da83db9e34cb7d867dcda705cb4/resources/classes.json).
-- For plain IG65 models there is no label map available.
-- Official Facebook Research Caffe2 models are [here](https://github.com/facebookresearch/vmz).
-
-
 ## Usage :computer:
 
 The following describes how to use the model in your own project and how to use our conversion and extraction tools.
 
 ### In Your Own Project
 
-- See the `convert` tool and copy the `r2plus1d_34` model architecture definition
-- See the `extract` tool for how to load the corresponding weights into the model
+We provide convenient [PyTorch Hub](https://pytorch.org/docs/stable/hub.html) integration
+
+```python
+>>> import torch
+>>>
+>>> torch.hub.list("moabitcoin/ig65m-pytorch")
+['r2plus1d_34_32_ig65m', 'r2plus1d_34_32_kinetics', 'r2plus1d_34_8_ig65m', 'r2plus1d_34_8_kinetics']
+>>>
+>>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=359, pretrained=True)
+```
+
+We also provide the following tools; see below for how to run them
+- `convert` - to convert Caffe2 blobs to PyTorch model and weights
+- `extract` - to compute clip features for a video with a pre-trained model
+- `semcode` - to visualize clip features for a video over time
 
 Note: we require torchvision v0.4 or later for the model architecture building blocks
+
 
 ### Development and Tools
 
 We provide CPU and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) based GPU Dockerfiles for self-contained and reproducible environments.
-
 Use the convenience Makefile to build the Docker image and then get into the container mounting a host directory to `/data` inside the container:
 
 ```
@@ -67,16 +60,24 @@ make webcam
 ```
 
 
-### Convert Weights :spaghetti:
+## PyTorch and ONNX Models :trophy:
 
-Build the docker image and get into the container as described above.
-Then see the `convert.py` tool's `--help` and its source.
+We provide converted `.pth` and `.pb` PyTorch and ONNX weights, respectively.
 
-### Extract Features :cookie:
 
-Build the docker image and get into the container as described above.
-Then see the `extract.py` tool's `--help` and its source.
+| Model         | Pretrain\+Finetune       | Input Size | pth                                            | onnx                                       | caffe2                                                            |
+|---------------|:-------------------------|:-----------|:-----------------------------------------------|:-------------------------------------------|:------------------------------------------------------------------|
+|  R(2+1)D_34   | IG-65M + None            |  8x112x112 | [r2plus1d_34_clip8_ig65m_from_scratch-9bae36ae.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch-9bae36ae.pth)           | [r2plus1d_34_clip8_ig65m_from_scratch-748ab053.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ig65m_from_scratch-748ab053.pb)           | [r2plus1d_34_clip8_ig65m_from_scratch.pkl](https://www.dropbox.com/s/6xwyu1az6oy4ts7/r2plus1d_34_clip8_ig65m_from_scratch_f79708462.pkl)               |
+|  R(2+1)D_34   | IG-65M + Kinetics        |  8x112x112 | [r2plus1d_34_clip8_ft_kinetics_from_ig65m-0aa0550b.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m-0aa0550b.pth)   | [r2plus1d_34_clip8_ft_kinetics_from_ig65m-625d61b3.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip8_ft_kinetics_from_ig65m-625d61b3.pb)   | [r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl](https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl)   |
+|  R(2+1)D_34   | IG-65M + None            | 32x112x112 | [r2plus1d_34_clip32_ig65m_from_scratch-449a7af9.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch-449a7af9.pth)         | [r2plus1d_34_clip32_ig65m_from_scratch-e304d648.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ig65m_from_scratch-e304d648.pb)         | [r2plus1d_34_clip32_ig65m_from_scratch.pkl](https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl)            |
+|  R(2+1)D_34   | IG-65M + Kinetics        | 32x112x112 | [r2plus1d_34_clip32_ft_kinetics_from_ig65m-ade133f1.pth](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m-ade133f1.pth) | [r2plus1d_34_clip32_ft_kinetics_from_ig65m-10f4c3bf.pb](https://github.com/moabitcoin/ig65m-pytorch/releases/download/v1.0.0/r2plus1d_34_clip32_ft_kinetics_from_ig65m-10f4c3bf.pb) | [r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl](https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl) |
 
+Notes
+- ONNX models provided here have not been optimized for inference.
+- Models fine-tuned on Kinetics have 400 classes, the plain IG65 models 487 (32 clips), and 359 (8 clips) classes.
+- For models fine-tuned on Kinetics you can use the labels from [here](https://github.com/Showmax/kinetics-downloader/blob/68bd8bc3b9e30da83db9e34cb7d867dcda705cb4/resources/classes.json).
+- For plain IG65 models there is no label map available.
+- Official Facebook Research Caffe2 models are [here](https://github.com/facebookresearch/vmz).
 
 
 ## References :book:
