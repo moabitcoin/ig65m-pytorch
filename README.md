@@ -14,7 +14,7 @@
 
 The following describes how to use the model in your own project and how to use our conversion and extraction tools.
 
-### In Your Own Project
+### PyTorch Models
 
 We provide convenient [PyTorch Hub](https://pytorch.org/docs/stable/hub.html) integration
 
@@ -27,15 +27,36 @@ We provide convenient [PyTorch Hub](https://pytorch.org/docs/stable/hub.html) in
 >>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=359, pretrained=True)
 ```
 
-We also provide the following tools; see below for how to run them
+### Tools
+
+We build and publish Docker images ([see all tags](https://hub.docker.com/r/moabitcoin/ig65m-pytorch/tags)) via Travis CI/CD for master and for all releases.
+
+In these images we provide the following tools:
 - `convert` - to convert Caffe2 blobs to PyTorch model and weights
 - `extract` - to compute clip features for a video with a pre-trained model
 - `semcode` - to visualize clip features for a video over time
 
-Note: we require torchvision v0.4 or later for the model architecture building blocks
+Run these pre-built images via
 
+```
+docker run moabitcoin/ig65m-pytorch:latest-cpu --help
+```
 
-### Development and Tools
+Example for running on CPUs:
+
+```
+docker run --ipc=host -v $PWD:/data moabitcoin/ig65m-pytorch:latest-gpu \
+    extract /data/myvideo.mp4 /data/myfeatures.npy
+```
+
+Example for running on GPUs via [nvidia-docker](https://github.com/NVIDIA/nvidia-docker):
+
+```
+docker run --runtime=nvidia --ipc=host -v $PWD:/data moabitcoin/ig65m-pytorch:latest-gpu \
+    extract /data/myvideo.mp4 /data/myfeatures.npy
+```
+
+### Development
 
 We provide CPU and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) based GPU Dockerfiles for self-contained and reproducible environments.
 Use the convenience Makefile to build the Docker image and then get into the container mounting a host directory to `/data` inside the container:
