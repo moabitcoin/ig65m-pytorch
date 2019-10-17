@@ -45,7 +45,7 @@ docker run moabitcoin/ig65m-pytorch:latest-cpu --help
 Example for running on CPUs:
 
 ```
-docker run --ipc=host -v $PWD:/data moabitcoin/ig65m-pytorch:latest-gpu \
+docker run --ipc=host -v $PWD:/data moabitcoin/ig65m-pytorch:latest-cpu \
     extract /data/myvideo.mp4 /data/myfeatures.npy
 ```
 
