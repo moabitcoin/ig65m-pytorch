@@ -1,4 +1,6 @@
-from torch.utils.data import Dataset, IterableDataset, get_worker_info
+import math
+
+from torch.utils.data import IterableDataset, get_worker_info
 
 import cv2
 
@@ -91,7 +93,7 @@ class VideoDataset(IterableDataset):
         if self.transform is not None:
             fn = self.transform
         else:
-            fn = lambda v: v
+            fn = lambda v: v  # noqa: E731
 
         return TransformedRange(BatchedRange(rng, self.clip), fn)
 
@@ -116,6 +118,6 @@ class WebcamDataset(IterableDataset):
         if self.transform is not None:
             fn = self.transform
         else:
-            fn = lambda v: v
+            fn = lambda v: v  # noqa: E731
 
         return TransformedRange(BatchedRange(rng, self.clip), fn)

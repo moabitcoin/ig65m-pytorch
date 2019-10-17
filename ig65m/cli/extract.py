@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from ig65m.models import r2plus1d_34_32_ig65m
 from ig65m.datasets import VideoDataset
-from ig65m.transforms import ToTensor, Resize, CenterCrop, Normalize
+from ig65m.transforms import ToTensor, Resize, Normalize
 
 
 class VideoModel(nn.Module):

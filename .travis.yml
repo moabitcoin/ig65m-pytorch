@@ -9,6 +9,7 @@ cache:
   timeout: 600
   directories:
   - $HOME/.cache
+  - $HOME/.docker/images
 
 matrix:
   fast_finish: true
@@ -28,12 +29,17 @@ before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get update && sudo apt-get -y install docker-ce
+
+  - docker load -i $HOME/.docker/images/images.tar || true
+
   - docker build -t $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT -f Dockerfile.cpu .
 
-  - wget https://www.dropbox.com/s/6xwyu1az6oy4ts7/r2plus1d_34_clip8_ig65m_from_scratch_f79708462.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ig65m_from_scratch.pkl
-  - wget https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl
-  - wget https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ig65m_from_scratch.pkl
-  - wget https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl
+  - docker run --rm --entrypoint /bin/bash $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT -c "python3 -m pip install flake8==3.7.8 && flake8 ."
+
+  - wget -c https://www.dropbox.com/s/6xwyu1az6oy4ts7/r2plus1d_34_clip8_ig65m_from_scratch_f79708462.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ig65m_from_scratch.pkl
+  - wget -c https://www.dropbox.com/s/p81twy88kwrrcop/r2plus1d_34_clip8_ft_kinetics_from_ig65m_%20f128022400.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip8_ft_kinetics_from_ig65m.pkl
+  - wget -c https://www.dropbox.com/s/eimo232tqw8mwi9/r2plus1d_34_clip32_ig65m_from_scratch_f102649996.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ig65m_from_scratch.pkl
+  - wget -c https://www.dropbox.com/s/z41ff7vs0bzf6b8/r2plus1d_34_clip32_ft_kinetics_from_ig65m_%20f106169681.pkl?dl=1 -O $HOME/.cache/r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl
 
 script:
   - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip8_ig65m_from_scratch.pkl /tmp/r2plus1d_34_clip8_ig65m_from_scratch --frames 8 --classes 487
@@ -45,6 +51,10 @@ script:
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT extract /data/video.mp4 /data/features.npy
 
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT semcode /data/features.npy /data/semcode.png
+
+before_cache:
+  - sudo chown travis:travis -R $HOME/.cache
+  - docker save -o $HOME/.docker/images/images.tar $(docker images -a -q)
 
 after_success:
   - |

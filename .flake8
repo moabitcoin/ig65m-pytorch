@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 120
+
+per-file-ignores =
+  hubconf.py : E402, F401

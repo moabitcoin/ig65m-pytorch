@@ -39,6 +39,5 @@ semcode.add_argument("--color", type=int, default=20, help="HSV hue in angle [0,
 semcode.set_defaults(main=ig65m.cli.semcode.main)
 
 
-
 args = parser.parse_args()
 args.main(args)
