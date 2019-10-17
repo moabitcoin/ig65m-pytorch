@@ -142,10 +142,10 @@ def main(args):
     blobs = blobs_from_pkl(args.pkl)
 
     if not "last_out_L{}_w".format(args.classes) in blobs:
-        sys.exit("Number of --classes does not match the last linear layer in .pkl blobs")
+        sys.exit("Error: number of --classes does not match the last linear layer in .pkl blobs")
 
     if not "last_out_L{}_b".format(args.classes) in blobs:
-        sys.exit("Number of --classes does not match the last linear layer in .pkl blobs")
+        sys.exit("Error: number of --classes does not match the last linear layer in .pkl blobs")
 
     model = r2plus1d_34(num_classes=args.classes)
 

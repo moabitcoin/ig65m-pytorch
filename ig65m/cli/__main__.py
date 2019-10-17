@@ -5,6 +5,9 @@ import ig65m.cli.convert
 import ig65m.cli.extract
 import ig65m.cli.semcode
 import ig65m.cli.dreamer
+import ig65m.cli.index
+import ig65m.cli.server
+import ig65m.cli.client
 
 
 parser = argparse.ArgumentParser(prog="ig65m")
@@ -48,6 +51,33 @@ dreamer.add_argument("--lr", type=float, default=0.1, help="how lucid the dream 
 dreamer.add_argument("--num-epochs", type=int, default=100, help="how long to dream")
 dreamer.add_argument("--gamma", type=float, default=1e-4, help="total variation regularization")
 dreamer.set_defaults(main=ig65m.cli.dreamer.main)
+
+
+index = subcmd.add_parser("index-build", help="📖 builds feature index", formatter_class=Formatter)
+index.add_argument("features", type=Path, help="file to save video features to")
+index.add_argument("index", type=Path, help="file to save index to")
+index.add_argument("--dimension", type=int, default=512, help="feature dimensionality")
+index.add_argument("--num-train", type=int, required=True, help="number of samples to train index on")
+index.add_argument("--batch-size", type=int, default=4096, help="number of features per index update batch")
+index.set_defaults(main=ig65m.cli.index.main)
+
+
+server = subcmd.add_parser("index-serve", help="⏳ starts up the index query server", formatter_class=Formatter)
+server.add_argument("index", type=Path, help="file to load index from")
+server.add_argument("--host", type=str, default="127.0.0.1")
+server.add_argument("--port", type=int, default=5000)
+server.add_argument("--dimension", type=int, default=512, help="feature dimensionality")
+server.set_defaults(main=ig65m.cli.server.main)
+
+
+client = subcmd.add_parser("index-query", help="📱 calls the index server for similarity", formatter_class=Formatter)
+client.add_argument("features", type=Path, help="file to read video features from")
+client.add_argument("clip", type=int, help="clip index in video to query the index with")
+client.add_argument("--host", type=str, default="127.0.0.1")
+client.add_argument("--port", type=int, default=5000)
+client.add_argument("--num-results", type=int, default=10, help="number of similar features to query for")
+client.add_argument("--dimension", type=int, default=512, help="feature dimensionality")
+client.set_defaults(main=ig65m.cli.client.main)
 
 
 args = parser.parse_args()
