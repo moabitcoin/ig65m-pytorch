@@ -52,6 +52,8 @@ script:
 
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT semcode /data/features.npy /data/semcode.png
 
+  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT dreamer /data/video.mp4 /data/dream.gif
+
 before_cache:
   - sudo chown travis:travis -R $HOME/.cache
   - docker save -o $HOME/.docker/images/images.tar $(docker images -a -q)
