@@ -1,6 +1,8 @@
 __pycache__
 *.py[cod]
 
+assets
+
 *.pth
 *.pb
 *.pkl

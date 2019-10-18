@@ -1,4 +1,6 @@
 import math
+import random
+import itertools
 
 from torch.utils.data import IterableDataset, get_worker_info
 
@@ -10,7 +12,7 @@ class FrameRange:
         assert first <= last
 
         for i in range(first):
-            ret, _ = video.read()
+            ret = video.grab()
 
             if not ret:
                 raise RuntimeError("seeking to frame at index {} failed".format(i))
@@ -20,7 +22,7 @@ class FrameRange:
         self.last = last
 
     def __next__(self):
-        if self.it >= self.last or not self.video.isOpened():
+        if self.it >= self.last:
             raise StopIteration
 
         ok, frame = self.video.read()
@@ -57,11 +59,11 @@ class TransformedRange:
 
 
 class VideoDataset(IterableDataset):
-    def __init__(self, path, clip, transform=None):
+    def __init__(self, path, clip_length, transform=None):
         super().__init__()
 
         self.path = path
-        self.clip = clip
+        self.clip_length = clip_length
         self.transform = transform
 
         video = cv2.VideoCapture(str(path))
@@ -72,7 +74,7 @@ class VideoDataset(IterableDataset):
         self.last = frames
 
     def __len__(self):
-        return self.last // self.clip
+        return self.last // self.clip_length
 
     def __iter__(self):
         info = get_worker_info()
@@ -95,14 +97,14 @@ class VideoDataset(IterableDataset):
         else:
             fn = lambda v: v  # noqa: E731
 
-        return TransformedRange(BatchedRange(rng, self.clip), fn)
+        return TransformedRange(BatchedRange(rng, self.clip_length), fn)
 
 
 class WebcamDataset(IterableDataset):
-    def __init__(self, clip, transform=None):
+    def __init__(self, clip_length, transform=None):
         super().__init__()
 
-        self.clip = clip
+        self.clip_length = clip_length
         self.transform = transform
         self.video = cv2.VideoCapture(0)
 
@@ -120,4 +122,27 @@ class WebcamDataset(IterableDataset):
         else:
             fn = lambda v: v  # noqa: E731
 
-        return TransformedRange(BatchedRange(rng, self.clip), fn)
+        return TransformedRange(BatchedRange(rng, self.clip_length), fn)
+
+
+class VideoDirectoryDataset(IterableDataset):
+    def __init__(self, path, clip_length, transform=None):
+        super().__init__()
+
+        self.clip_length = clip_length
+        self.transform = transform
+
+        paths = [p for p in path.iterdir() if p.is_file()]
+
+        self.videos = [VideoDataset(p, clip_length, transform) for p in paths]
+        self.total_clips = sum(len(v) for v in self.videos)
+
+    def __iter__(self):
+        info = get_worker_info()
+
+        if info is not None:
+            raise RuntimeError("multiple workers not supported in VideoDirectoryDataset")
+
+        random.shuffle(self.videos)
+
+        return itertools.chain(*self.videos)

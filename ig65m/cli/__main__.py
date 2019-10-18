@@ -5,6 +5,7 @@ import ig65m.cli.convert
 import ig65m.cli.extract
 import ig65m.cli.semcode
 import ig65m.cli.dreamer
+import ig65m.cli.vgan
 
 
 parser = argparse.ArgumentParser(prog="ig65m")
@@ -48,6 +49,18 @@ dreamer.add_argument("--lr", type=float, default=0.1, help="how lucid the dream 
 dreamer.add_argument("--num-epochs", type=int, default=100, help="how long to dream")
 dreamer.add_argument("--gamma", type=float, default=1e-4, help="total variation regularization")
 dreamer.set_defaults(main=ig65m.cli.dreamer.main)
+
+
+vgan = subcmd.add_parser("vgan", help="🥑 video generative adversarial network", formatter_class=Formatter)
+vgan.add_argument("videos", type=Path, help="directory to read videos from")
+vgan.add_argument("--checkpoints", type=Path, required=True, help="directory to save checkpoints to")
+vgan.add_argument("--num-epochs", type=int, default=100, help="number of epochs to run through dataset")
+vgan.add_argument("--batch-size", type=int, default=1, help="number of clips per batch")
+vgan.add_argument("--clip-length", type=int, default=32, help="number of frames per clip")
+vgan.add_argument("--z-dimension", type=int, default=128, help="noise dimensionality")
+vgan.add_argument("--save-frequency", type=int, default=100, help="number of steps to checkpoint after")
+vgan.add_argument("--logs", type=Path, required=True, help="directory to save TensorBoard logs to")
+vgan.set_defaults(main=ig65m.cli.vgan.main)
 
 
 args = parser.parse_args()
