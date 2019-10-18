@@ -45,6 +45,7 @@ dreamer.add_argument("video", type=Path, help="video to plant into the dream")
 dreamer.add_argument("dream", type=Path, help="file to save dream animation to")
 dreamer.add_argument("--lr", type=float, default=0.1, help="how lucid the dream is")
 dreamer.add_argument("--num-epochs", type=int, default=100, help="how long to dream")
+dreamer.add_argument("--gamma", type=float, default=1e-4, help="total variation regularization")
 dreamer.set_defaults(main=ig65m.cli.dreamer.main)
 
 

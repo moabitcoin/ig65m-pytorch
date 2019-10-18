@@ -25,12 +25,13 @@ class VideoModel(nn.Module):
 
     def forward(self, x):
         x = self.model.stem(x)
-        x = self.model.layer1(x)
-        x = self.model.layer2(x)
-        #x = self.model.layer3(x)
-        #x = self.model.layer4(x)
 
-        return x
+        l1 = self.model.layer1(x)
+        l2 = self.model.layer2(l1)
+        l3 = self.model.layer3(l2)
+        #l4 = self.model.layer4(l3)
+
+        return [l2, l3]
 
 
 class TotalVariationLoss(nn.Module):
@@ -40,9 +41,9 @@ class TotalVariationLoss(nn.Module):
     def forward(self, inputs):
         loss = 0.
 
-        loss += (inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]).abs().sum() / inputs.numel()
-        loss += (inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]).abs().sum() / inputs.numel()
-        loss += (inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]).abs().sum() / inputs.numel()
+        loss += (inputs[:, :, :-1, :, :] - inputs[:, :, 1:, :, :]).abs().sum()
+        loss += (inputs[:, :, :, :-1, :] - inputs[:, :, :, 1:, :]).abs().sum()
+        loss += (inputs[:, :, :, :, :-1] - inputs[:, :, :, :, 1:]).abs().sum()
 
         return loss
 
@@ -95,22 +96,32 @@ def main(args):
 
         acts = model(video)
 
-        loss = acts.norm() + (-1) * 100 * variation(video)
+        loss = 0.
+
+        weights = [1, 1]
+        weights = torch.tensor(weights, device=device, dtype=torch.float32)
+
+        for act, w in zip(acts, weights):
+            loss += w * act.norm()
+
+        tv = -1 * variation(video) * args.gamma
+        loss += tv
+
         loss.backward()
 
-        avg = video.grad.data.abs().mean()
-        lr = args.lr / avg
+        grad = video.grad.data
+        grad /= grad.std() + 1e-12
 
-        video.data += lr * video.grad.data
+        video.data += args.lr * grad
 
         for i in range(video.size(1)):
-            cmin = -mean[i] / std[i]
-            cmax = (1 - mean[i]) / std[i]
+            cmin = (0. - mean[i]) / std[i]
+            cmax = (1. - mean[i]) / std[i]
             video.data[0, i].clamp_(cmin, cmax)
 
         video.grad.data.zero_()
 
-        progress.set_postfix({"loss": loss.item(), "avg": avg.item(), "lr": lr.item()})
+        progress.set_postfix({"loss": loss.item(), "tv": tv.item()})
 
     video = rearrange(video, "() c t h w -> c t h w")
     video = denormalize(video)
