@@ -49,9 +49,13 @@ def main(args):
     model = VideoModel(pool_spatial=args.pool_spatial,
                        pool_temporal=args.pool_temporal)
 
+    model.eval()
+
+    for params in model.parameters():
+        params.requires_grad = False
+
     model = model.to(device)
     model = nn.DataParallel(model)
-    model.eval()
 
     transform = Compose([
         ToTensor(),
