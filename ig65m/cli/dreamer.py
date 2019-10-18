@@ -29,10 +29,10 @@ class VideoModel(nn.Module):
         l0 = self.model.stem(x)
         l1 = self.model.layer1(l0)
         l2 = self.model.layer2(l1)
-        l3 = self.model.layer3(l2)
-        l4 = self.model.layer4(l3)
+        # l3 = self.model.layer3(l2)
+        # l4 = self.model.layer4(l3)
 
-        return [l0, l1, l2, l3, l4]
+        return [l0, l1, l2]  # , l3, l4]
 
 
 # The total variation offsets the clip by one pixel in
@@ -78,6 +78,9 @@ def main(args):
         Resize(args.frame_size),
         Normalize(mean=mean, std=std),
     ])
+
+    # Take first clip from video only for now.
+    # Could be made to run on the full video.
 
     dataset = VideoDataset(args.video, clip=32, transform=transform)
 
