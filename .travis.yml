@@ -47,12 +47,14 @@ script:
   - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip32_ig65m_from_scratch.pkl /tmp/r2plus1d_34_clip32_ig65m_from_scratch --frames 32 --classes 359
   - docker run --rm -v $HOME/.cache:/root/.cache $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT convert /root/.cache/r2plus1d_34_clip32_ft_kinetics_from_ig65m.pkl /tmp/r2plus1d_34_clip32_ft_kinetics_from_ig65m --frames 32 --classes 400
 
-  - ffmpeg -f lavfi -i testsrc=duration=10:size=112x112:rate=30 video.mp4
-  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT extract /data/video.mp4 /data/features.npy
+  - ffmpeg -loglevel error -f lavfi -i testsrc=duration=5:size=112x112:rate=30 video-112x112.mp4
+  - ffmpeg -loglevel error -f lavfi -i testsrc=duration=5:size=64x64:rate=30 video-64x64.mp4
+
+  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT extract /data/video-112x112.mp4 /data/features.npy
 
   - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT semcode /data/features.npy /data/semcode.png
 
-  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT dreamer /data/video.mp4 /data/dream.gif
+  - docker run --rm -v $HOME/.cache:/root/.cache -v $PWD:/data $TRAVIS_REPO_SLUG-$TRAVIS_COMMIT dreamer /data/video-64x64.mp4 /data/dream.gif --num-epochs 3
 
 before_cache:
   - sudo chown travis:travis -R $HOME/.cache

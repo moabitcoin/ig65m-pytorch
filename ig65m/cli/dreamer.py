@@ -26,13 +26,16 @@ class VideoModel(nn.Module):
         self.model = r2plus1d_34_32_ig65m(num_classes=359, pretrained=True, progress=True)
 
     def forward(self, x):
-        l0 = self.model.stem(x)
-        l1 = self.model.layer1(l0)
-        l2 = self.model.layer2(l1)
-        # l3 = self.model.layer3(l2)
-        # l4 = self.model.layer4(l3)
+        # layer2 seems to be a good trade-off between
+        # low and high end clip features (on my videos)
 
-        return [l0, l1, l2]  # , l3, l4]
+        x = self.model.stem(x)
+        x = self.model.layer1(x)
+        x = self.model.layer2(x)
+        # x = self.model.layer3(x)
+        # x = self.model.layer4(x)
+
+        return x
 
 
 # The total variation offsets the clip by one pixel in
@@ -103,22 +106,17 @@ def main(args):
     progress = tqdm(range(args.num_epochs))
 
     for epoch in progress:
-        acts = model(video)
-
         loss = 0.
 
-        # How strongly to weight the normed activations in layer i
-        # Using layer2 seems to be a good trade-off (on my videos)
-        weights = [0, 0, 1, 0, 0]
-        weights = torch.tensor(weights, device=device, dtype=torch.float32)
+        acts = model(video)
 
         # Which channel to maximize normed activations in layer i
         # Channel 6 in layer2 activates on moving eye-like visuals
         channels = [0, 0, 6, 0, 0]
         channels = torch.tensor(channels, device=device, dtype=torch.int64)
 
-        for act, w, c in zip(acts, weights, channels):
-            loss += w * act.norm()
+        for act, c in zip(acts, channels):
+            loss += act.norm()
 
             # Instead of maximizing all channels, another option is
             # to maximize specific channel activations; see c above:
