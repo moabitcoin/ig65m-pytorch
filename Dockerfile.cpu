@@ -2,11 +2,10 @@ FROM ubuntu:18.04 as build-stage
 
 WORKDIR /usr/src/app
 
-# AVX2 faiss compilation blocked by https://github.com/facebookresearch/faiss/issues/994
-ENV LANG="C.UTF-8" LC_ALL="C.UTF-8" PATH="/opt/venv/bin:$PATH" PIP_NO_CACHE_DIR="false"
+ENV LANG="C.UTF-8" LC_ALL="C.UTF-8" PATH="/opt/venv/bin:$PATH" PIP_NO_CACHE_DIR="false" CFLAGS="-mavx2" CXXFLAGS="-mavx2"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-venv python3-dev wget make g++ libblas-dev liblapack-dev swig && \
+    python3 python3-pip python3-venv python3-dev wget make g++ libblas-dev liblapack-dev swig patch && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -16,21 +15,25 @@ RUN python3 -m venv /opt/venv && \
 
 RUN python3 -m piptools sync
 
+COPY patches .
+
 RUN wget -q https://github.com/facebookresearch/faiss/archive/v1.6.0.tar.gz -O faiss.tar.gz && \
-     echo "71a47cbb00aa0ae09b77a70d3fa1617bf7861cc7d41936458b88c7a161b03660 faiss.tar.gz" | sha256sum -c && \
-     tar xf faiss.tar.gz && \
-     rm faiss.tar.gz && \
-     cd faiss* && \
-     ./configure --without-cuda && \
-     make -j $(nproc) && \
-     cd python && \
-     sed -i "s/print(/#print(/" faiss.py && \
-     make -j $(nproc) && \
-     python3 setup.py bdist_wheel && \
-     cd ../../ && \
-     python3 -m pip install faiss*/python/dist/faiss*.whl && \
-     cp faiss*/python/dist/faiss*.whl /opt/ && \
-     rm -rf faiss*
+    echo "71a47cbb00aa0ae09b77a70d3fa1617bf7861cc7d41936458b88c7a161b03660 faiss.tar.gz" | sha256sum -c && \
+    tar xf faiss.tar.gz && \
+    rm faiss.tar.gz && \
+    cd faiss* && \
+    ls .. && \
+    patch -p1 < ../faiss-fix-compilation-for-mavx2.patch && \
+    patch -p1 < ../faiss-fix-python-module-prints.patch && \
+    ./configure --without-cuda && \
+    make -j $(nproc) && \
+    cd python && \
+    make -j $(nproc) && \
+    python3 setup.py bdist_wheel && \
+    cd ../../ && \
+    python3 -m pip install faiss*/python/dist/faiss*.whl && \
+    cp faiss*/python/dist/faiss*.whl /opt/ && \
+    rm -rf faiss*
 
 
 

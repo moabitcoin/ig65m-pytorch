@@ -1,0 +1,20 @@
+diff --git a/python/faiss.py b/python/faiss.py
+index 3adbbf4..ae28e0a 100644
+--- a/python/faiss.py
++++ b/python/faiss.py
+@@ -35,15 +35,12 @@ def instruction_set():
+ try:
+     instr_set = instruction_set()
+     if instr_set == "AVX2":
+-        print("Loading faiss with AVX2 support.", file=sys.stderr)
+         from .swigfaiss_avx2 import *
+     else:
+-        print("Loading faiss.", file=sys.stderr)
+         from .swigfaiss import *
+ 
+ except ImportError:
+     # we import * so that the symbol X can be accessed as faiss.X
+-    print("Loading faiss.", file=sys.stderr)
+     from .swigfaiss import *
+ 
+ 
