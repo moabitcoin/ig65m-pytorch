@@ -1,13 +1,21 @@
 <h1 align='center'>IG-65M PyTorch</h1>
 
-<p align=center>
-  Unofficial PyTorch (and ONNX) 3D video classification models and weights pre-trained on IG-65M (65MM Instagram videos).
-
-  <img src="assets/primer.png" alt="IG-65M activations for the Primer movie trailer video; time goes top to bottom" />
-  <i>IG-65M activations for the Primer movie trailer video; time goes top to bottom</i>
-</p>
-
 <p align="center"><a href="https://travis-ci.org/moabitcoin/ig65m-pytorch"><img src="https://travis-ci.org/moabitcoin/ig65m-pytorch.svg?branch=master" /></a></p>
+
+Unofficial PyTorch (and ONNX) 3D video classification models and weights pre-trained on IG-65M (65MM Instagram videos).
+
+![](./assets/primer.png)
+*IG-65M activations for the Primer movie trailer video; time goes top to bottom*
+
+|                          |                          |
+|--------------------------|--------------------------|
+| ![](./assets/dream0.gif) | ![](./assets/dream1.gif) |
+
+|                          |                          |
+|--------------------------|--------------------------|
+| ![](./assets/dream2.gif) | ![](./assets/dream3.gif) |
+
+*IG-65M video deep dream: maximizing activations; for more see [this pull request](https://github.com/moabitcoin/ig65m-pytorch/pull/19)*
 
 
 ## Usage :computer:
