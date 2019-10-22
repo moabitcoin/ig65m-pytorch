@@ -1,4 +1,5 @@
 import sys
+import json
 from xmlrpc.client import ServerProxy
 
 import numpy as np
@@ -29,5 +30,14 @@ def main(args):
         indices = batch_indices[0]
         metas = batch_metas[0]
 
+        features = []
+
         for dist, index, meta in zip(dists, indices, metas):
-            print("distance={} index={} meta={}".format(round(dist), index, meta))
+            path = meta["path"]
+            clip = meta["clip"]
+
+            feature = {"distance": round(dist, 2), "path": path, "clip": clip}
+
+            features.append(feature)
+
+        print(json.dumps(features))
