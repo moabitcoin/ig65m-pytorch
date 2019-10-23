@@ -59,6 +59,9 @@ index.add_argument("index", type=Path, help="file to save index to")
 index.add_argument("--dimension", type=int, default=512, help="feature dimensionality")
 index.add_argument("--num-train", type=int, required=True, help="number of samples to train index on")
 index.add_argument("--batch-size", type=int, default=4096, help="number of features per index update batch")
+index.add_argument("--num-centroids", type=int, default=1024, help="number of partitions; c * sqrt(n)")
+index.add_argument("--code-size", type=int, default=64, help="number of sub-quantizer")
+index.add_argument("--num-bits", type=int, default=8, help="number of bits per sub-quantizer")
 index.set_defaults(main=ig65m.cli.index.main)
 
 
@@ -67,6 +70,7 @@ server.add_argument("index", type=Path, help="file to load index from")
 server.add_argument("--host", type=str, default="127.0.0.1")
 server.add_argument("--port", type=int, default=5000)
 server.add_argument("--dimension", type=int, default=512, help="feature dimensionality")
+server.add_argument("--num-probes", type=int, default=8, help="number of inverted lists to pre-select")
 server.set_defaults(main=ig65m.cli.server.main)
 
 

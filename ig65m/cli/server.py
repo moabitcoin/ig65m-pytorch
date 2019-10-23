@@ -10,6 +10,7 @@ from faiss import read_index
 
 def main(args):
     index = read_index(str(args.index.with_suffix(".idx")))
+    index.nprobe = args.num_probes
 
     with args.index.with_suffix(".json").open() as fp:
         metadata = json.load(fp)

@@ -10,19 +10,15 @@ from faiss import IndexFlatL2, IndexIVFPQ, write_index
 from ig65m.samplers import StreamSampler
 
 
-kNumCells = 100
-kNumCentroids = 256  # Note: on GPU this will not work; see links below
-kNumBitsPerIdx = 8
-
-# GPU centroid limitations
+# GPU index constraints
 # - https://github.com/facebookresearch/faiss/blob/a8118acbc516b0263dde610862c806400cc48bf5/gpu/impl/IVFPQ.cu#L69-L92
 # - https://github.com/facebookresearch/faiss/blob/a8118acbc516b0263dde610862c806400cc48bf5/ProductQuantizer.cpp#L189
 
 
 def main(args):
     # https://github.com/facebookresearch/faiss/blob/a8118acbc516b0263dde610862c806400cc48bf5/Clustering.cpp#L78-L80
-    if args.num_train < max(kNumCells, kNumCentroids):
-        sys.exit("💥 Require at least {} training samples".format(max(kNumCells, kNumCentroids)))
+    if args.num_train < max(args.num_centroids, args.code_size):
+        sys.exit("💥 Require at least {} training samples".format(max(args.num_centroids, args.code_size)))
 
     paths = [path for path in args.features.iterdir() if path.is_file()]
 
@@ -67,7 +63,7 @@ def main(args):
 
     quantizer = IndexFlatL2(args.dimension)
 
-    index = IndexIVFPQ(quantizer, args.dimension, kNumCells, kNumCentroids, kNumBitsPerIdx)
+    index = IndexIVFPQ(quantizer, args.dimension, args.num_centroids, args.code_size, args.num_bits)
 
     print("🚄 Training index on {} out of {} total {}-dimensional clip features"
           .format(args.num_train, total_clips, args.dimension), file=sys.stderr)
