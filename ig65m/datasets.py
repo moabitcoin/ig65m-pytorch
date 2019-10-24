@@ -60,6 +60,9 @@ class VideoDataset(IterableDataset):
     def __init__(self, path, clip, transform=None):
         super().__init__()
 
+        if not path.is_file():
+            raise RuntimeError("video at {} does not exist".format(path))
+
         self.path = path
         self.clip = clip
         self.transform = transform
