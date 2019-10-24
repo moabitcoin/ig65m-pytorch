@@ -2,7 +2,7 @@ FROM ubuntu:18.04 as build-stage
 
 WORKDIR /usr/src/app
 
-ENV LANG="C.UTF-8" LC_ALL="C.UTF-8" PATH="/opt/venv/bin:$PATH" PIP_NO_CACHE_DIR="false" CFLAGS="-mavx2" CXXFLAGS="-mavx2"
+ENV LANG="C.UTF-8" LC_ALL="C.UTF-8" PATH="/opt/venv/bin:$PATH" PIP_NO_CACHE_DIR="false" CFLAGS="-mavx2 -mf16c" CXXFLAGS="-mavx2 -mf16c"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv python3-dev wget make g++ libblas-dev liblapack-dev swig patch && \
