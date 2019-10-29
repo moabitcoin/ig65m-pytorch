@@ -43,6 +43,9 @@ In these images we provide the following tools:
 - `convert` - to convert Caffe2 blobs to PyTorch model and weights
 - `extract` - to compute clip features for a video with a pre-trained model
 - `semcode` - to visualize clip features for a video over time
+- `index-build` - to build an approximate nearest neighbor index from clip features
+- `index-serve` - to load an approximate nearest neighbor index and serve queries
+- `index-query`- to make approximate nearest neighbor queries against an index server
 
 Run these pre-built images via
 
