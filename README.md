@@ -32,7 +32,7 @@ We provide convenient [PyTorch Hub](https://pytorch.org/docs/stable/hub.html) in
 >>> torch.hub.list("moabitcoin/ig65m-pytorch")
 ['r2plus1d_34_32_ig65m', 'r2plus1d_34_32_kinetics', 'r2plus1d_34_8_ig65m', 'r2plus1d_34_8_kinetics']
 >>>
->>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=359, pretrained=True)
+>>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=487, pretrained=True)
 ```
 
 ### Tools
