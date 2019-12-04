@@ -20,7 +20,7 @@ def r2plus1d_34_8_ig65m(num_classes, pretrained=False, progress=False):
       pretrained: If True, loads weights pretrained on 65 million Instagram videos
       progress: If True, displays a progress bar of the download to stderr
     """
-    assert not pretrained or num_classes == 359, "pretrained on 359 classes"
+    assert not pretrained or num_classes == 487, "pretrained on 487 classes"
     return r2plus1d_34(num_classes=num_classes, arch="r2plus1d_34_8_ig65m",
                        pretrained=pretrained, progress=progress)
 
@@ -33,7 +33,7 @@ def r2plus1d_34_32_ig65m(num_classes, pretrained=False, progress=False):
       pretrained: If True, loads weights pretrained on 65 million Instagram videos
       progress: If True, displays a progress bar of the download to stderr
     """
-    assert not pretrained or num_classes == 487, "pretrained on 487 classes"
+    assert not pretrained or num_classes == 359, "pretrained on 359 classes"
     return r2plus1d_34(num_classes=num_classes, arch="r2plus1d_34_32_ig65m",
                        pretrained=pretrained, progress=progress)
 

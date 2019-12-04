@@ -32,7 +32,7 @@ We provide convenient [PyTorch Hub](https://pytorch.org/docs/stable/hub.html) in
 >>> torch.hub.list("moabitcoin/ig65m-pytorch")
 ['r2plus1d_34_32_ig65m', 'r2plus1d_34_32_kinetics', 'r2plus1d_34_8_ig65m', 'r2plus1d_34_8_kinetics']
 >>>
->>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=487, pretrained=True)
+>>> model = torch.hub.load("moabitcoin/ig65m-pytorch", "r2plus1d_34_32_ig65m", num_classes=359, pretrained=True)
 ```
 
 ### Tools
@@ -106,7 +106,7 @@ We provide converted `.pth` and `.pb` PyTorch and ONNX weights, respectively.
 
 Notes
 - ONNX models provided here have not been optimized for inference.
-- Models fine-tuned on Kinetics have 400 classes, the plain IG65 models 487 (32 clips), and 359 (8 clips) classes.
+- Models fine-tuned on Kinetics have 400 classes, the plain IG65 models 359 (32 clips), and 487 (8 clips) classes.
 - For models fine-tuned on Kinetics you can use the labels from [here](https://github.com/Showmax/kinetics-downloader/blob/68bd8bc3b9e30da83db9e34cb7d867dcda705cb4/resources/classes.json).
 - For plain IG65 models there is no label map available.
 - Official Facebook Research Caffe2 models are [here](https://github.com/facebookresearch/vmz).
